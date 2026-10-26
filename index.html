@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Virtual Office - Orchestrator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="office-container">
+        <header>
+            <h1>🏢 AI Virtual Office (Orchestrator)</h1>
+            <p>Ketik tugasmu, biarkan tim AI yang bekerja 24/7.</p>
+        </header>
+
+        <!-- Visualisasi Sederhana Ruang Kantor / Agen -->
+        <div class="office-grid">
+            <div class="agent-card" id="boss-agent">
+                <h3>👑 Orchestrator (Boss)</h3>
+                <span class="status idle">Status: Siap Menerima Perintah</span>
+                <p class="log">Menunggu instruksi...</p>
+            </div>
+            <div class="agent-card" id="writer-agent">
+                <h3>✍️ AI Copywriter</h3>
+                <span class="status idle">Status: Standby</span>
+                <p class="log">-</p>
+            </div>
+            <div class="agent-card" id="coder-agent">
+                <h3>💻 AI Coder</h3>
+                <span class="status idle">Status: Standby</span>
+                <p class="log">-</p>
+            </div>
+        </div>
+
+        <!-- Panel Kontrol Perintah -->
+        <div class="control-panel">
+            <textarea id="taskInput" placeholder="Masukkan perintah untuk tim AI kamu di sini... (Contoh: Buatkan draf konten promosi produk X)"></textarea>
+            <button id="runBtn" onclick="runWorkflow()">Jalankan Sistem (Run)</button>
+        </div>
+
+        <!-- Log Aktivitas / Chat -->
+        <div class="output-console">
+            <h3>📜 Live Execution Log:</h3>
+            <div id="logOutput">Sistem siap. Masukkan API Key dan perintah Anda.</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
