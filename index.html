@@ -3,502 +3,770 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORCA AI v9.0 - 3D Virtual Office with Live Speech Bubbles</title>
-    <!-- Tailwind CSS & FontAwesome -->
+    <title>ORCA AI - Cyberpunk Virtual Office (v8.3 Ultimate)</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Three.js untuk 3D Graphics -->
+    <!-- Three.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- GSAP for Cinematic Camera Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050508; color: #f3f4f6; overflow: hidden; }
-        .font-mono { font-family: 'Fira Code', monospace; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-        ::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.5); border-radius: 3px; }
-        .glass-panel { background: rgba(13, 17, 23, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .collapsible-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 450px; opacity: 1; overflow: hidden; }
-        .collapsible-content.collapsed { max-height: 0 !important; opacity: 0; padding-top: 0 !important; padding-bottom: 0 !important; margin: 0 !important; border: none !important; }
-        
-        /* CSS untuk 3D Speech Bubble HTML Overlay */
-        .speech-bubble {
-            position: absolute;
-            transform: translate(-50%, -100%);
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(249, 115, 22, 0.6);
-            color: #fdba74;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-family: 'Fira Code', monospace;
-            white-space: nowrap;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 20;
+        body { font-family: 'Inter', sans-serif; background-color: #020205; color: #f3f4f6; overflow: hidden; margin: 0; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(3, 3, 5, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.5); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(249, 115, 22, 0.8); }
+        .glass-panel {
+            background: rgba(10, 10, 18, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        .speech-bubble.active {
-            opacity: 1;
+        .neon-glow-orange { box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); }
+        canvas { display: block; outline: none; }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.9; }
         }
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px 5px 0;
-            border-style: solid;
-            border-color: rgba(15, 23, 42, 0.9) transparent;
-            display: block;
-            width: 0;
-        }
+        .animate-pulse-glow { animation: pulseGlow 3s infinite ease-in-out; }
+        .panel-transition { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; }
     </style>
 </head>
-<body class="w-screen h-screen relative select-none">
+<body class="relative h-screen w-screen flex flex-col select-none">
 
-    <!-- Canvas 3D Three.js -->
-    <div id="canvas-container" class="absolute inset-0 z-0"></div>
+    <!-- Top Navigation Bar -->
+    <header class="absolute top-0 left-0 right-0 z-30 px-6 py-3 flex items-center justify-between glass-panel border-b border-white/10">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center neon-glow-orange">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-base tracking-wider text-white">ORCA <span class="text-orange-500">AI</span></span>
+                    <span class="text-[9px] bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-mono">v8.3 ULTIMATE</span>
+                </div>
+                <p class="text-[11px] text-slate-400">Cinematic 3D Virtual Office & RGB Gaming PCs</p>
+            </div>
+        </div>
 
-    <!-- HTML Container untuk 3D Speech Bubbles di atas kepala robot -->
-    <div id="bubble-container" class="absolute inset-0 z-20 pointer-events-none overflow-hidden">
-        <div id="bubble-boss" class="speech-bubble">👑 Boss: Siap memproses tugas...</div>
-        <div id="bubble-writer" class="speech-bubble">✍️ Copywriter: Menulis draf...</div>
-        <div id="bubble-coder" class="speech-bubble">💻 Coder: Merakit script...</div>
-        <div id="bubble-analyst" class="speech-bubble">📊 Analyst: Analisis data...</div>
-    </div>
+        <!-- Cinematic Camera Preset Buttons -->
+        <div class="hidden lg:flex items-center space-x-1.5 bg-slate-900/90 p-1.5 rounded-xl border border-white/10">
+            <button onclick="camPreset('overview')" class="px-3 py-1 text-xs font-semibold bg-slate-800 hover:bg-orange-600 hover:text-white text-slate-300 rounded-lg transition">Overview</button>
+            <button onclick="camPreset('boss')" class="px-3 py-1 text-xs font-semibold bg-slate-800 hover:bg-orange-600 hover:text-white text-slate-300 rounded-lg transition">👑 Boss Mezzanine</button>
+            <button onclick="camPreset('team')" class="px-3 py-1 text-xs font-semibold bg-slate-800 hover:bg-orange-600 hover:text-white text-slate-300 rounded-lg transition">💻 Tim AI Workstation</button>
+            <button onclick="camPreset('city')" class="px-3 py-1 text-xs font-semibold bg-slate-800 hover:bg-orange-600 hover:text-white text-slate-300 rounded-lg transition">🌆 City View</button>
+        </div>
 
-    <!-- UI Overlay Layer -->
-    <div class="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-4 md:p-6">
+        <div class="flex items-center space-x-3">
+            <button onclick="resetCamera()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 transition shadow-lg flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>Reset</span>
+            </button>
+            <a href="https://www.instagram.com/" target="_blank" class="px-3.5 py-1.5 text-xs font-semibold bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white rounded-lg shadow-lg neon-glow-orange transition transform hover:scale-105">
+                Ambil Akses
+            </a>
+        </div>
+    </header>
+
+    <!-- Main 3D Canvas Container -->
+    <div id="canvas-container" class="absolute inset-0 w-full h-full"></div>
+
+    <!-- UI Overlay: Left Sidebar (Collapsible Panels) -->
+    <div class="absolute top-20 left-4 z-20 w-80 md:w-88 flex flex-col space-y-3 pointer-events-none">
         
-        <!-- TOP HEADER -->
-        <header class="pointer-events-auto flex items-center justify-between glass-panel px-6 py-3 rounded-2xl shadow-2xl border-t-2 border-orange-500">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
-                    <i class="fa-solid fa-cube text-white text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-base tracking-wide bg-gradient-to-r from-orange-400 to-amber-200 bg-clip-text text-transparent">
-                        ORCA AI <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">v9.0 3D SPEECH</span>
-                    </h1>
-                    <p class="text-[11px] text-gray-400">Virtual Office with Interactive Robot Dialogue & RGB PCs</p>
+        <!-- Workflow Input Panel (Collapsible) -->
+        <div class="glass-panel p-4 rounded-2xl pointer-events-auto border-t-2 border-orange-500">
+            <div class="flex items-center justify-between mb-2 cursor-pointer" onclick="togglePanel('command-body', 'command-arrow')">
+                <h2 class="text-xs font-bold text-white flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>Orchestrator Command Center</span>
+                </h2>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">READY</span>
+                    <svg id="command-arrow" class="w-4 h-4 text-slate-400 transform rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-3">
-                <button onclick="resetCamera()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-orange-400 border border-slate-700 transition flex items-center space-x-1.5 shadow-md">
-                    <i class="fa-solid fa-video"></i><span>Reset Cam</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- MAIN FLOATING PANELS -->
-        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 my-3 pointer-events-none items-start overflow-hidden">
-            
-            <!-- LEFT COLUMN: Command Center -->
-            <div class="lg:col-span-4 pointer-events-auto glass-panel rounded-2xl p-4 shadow-2xl border-l-4 border-orange-500 flex flex-col">
-                <div class="flex items-center justify-between pb-2.5 border-b border-white/10 cursor-pointer" onclick="togglePanel('command-body', 'command-icon')">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
-                            <i class="fa-solid fa-terminal text-xs"></i>
-                        </div>
-                        <h2 class="font-bold text-xs tracking-wide text-white">Orchestrator Command Center</h2>
+            <div id="command-body" class="panel-transition overflow-hidden">
+                <p class="text-[11px] text-slate-300 mb-2">Ketik instruksi tugas untuk Boss AI. Boss akan memecah tugas & mendelegasikannya ke tim AI ber-PC gaming RGB.</p>
+                
+                <textarea id="taskInput" rows="2" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-none font-mono" placeholder="Contoh: Buatkan kampanye iklan produk SaaS AI otomatis..."></textarea>
+                
+                <div class="mt-2.5 flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-[10px] text-slate-400">
+                        <span id="agentCount" class="font-bold text-orange-400">5 Robotic Agents</span> Online
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <span id="commandBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">READY</span>
-                        <i id="command-icon" class="fa-solid fa-chevron-up text-gray-400 transition-transform duration-300 text-xs"></i>
-                    </div>
-                </div>
-
-                <div id="command-body" class="collapsible-content pt-3 space-y-3">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">Master Prompt / Perintah Utama:</label>
-                        <textarea id="taskInput" class="w-full h-20 bg-slate-900/90 border border-slate-700/80 rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-orange-500 transition resize-none font-mono shadow-inner" placeholder="Contoh: Buatkan riset market & strategi marketing 24/7..."></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="runWorkflow()" id="runBtn" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-play"></i><span>Jalankan Tim</span>
-                        </button>
-                        <button onclick="clearWorkflow()" class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 font-semibold text-xs border border-slate-700 transition flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-rotate-right"></i><span>Reset</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- RIGHT COLUMN: Tim AI Workstation -->
-            <div class="lg:col-span-4 lg:col-start-9 pointer-events-auto glass-panel rounded-2xl p-4 shadow-2xl border-l-4 border-amber-500 flex flex-col">
-                <div class="flex items-center justify-between pb-2.5 border-b border-white/10 cursor-pointer" onclick="togglePanel('workstation-body', 'workstation-icon')">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
-                            <i class="fa-solid fa-users-gear text-xs"></i>
-                        </div>
-                        <h2 class="font-bold text-xs tracking-wide text-white">TIM AI WORKSTATION</h2>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-[9px] text-amber-400 font-semibold">SPEECH BUBBLES ACTIVE</span>
-                        <i id="workstation-icon" class="fa-solid fa-chevron-up text-gray-400 transition-transform duration-300 text-xs"></i>
-                    </div>
-                </div>
-
-                <div id="workstation-body" class="collapsible-content pt-3 space-y-2 max-h-[260px] overflow-y-auto pr-1">
-                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-xs shadow">👑</div>
-                            <div>
-                                <h4 class="font-bold text-[11px] text-white">Boss Office (Mezzanine)</h4>
-                                <p class="text-[9px] text-gray-400">Orchestrator Unit</p>
-                            </div>
-                        </div>
-                        <span id="status-boss" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Standby</span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xs shadow">✍️</div>
-                            <div>
-                                <h4 class="font-bold text-[11px] text-white">AI Copywriter</h4>
-                                <p class="text-[9px] text-gray-400">Desk 1 (Ground Floor)</p>
-                            </div>
-                        </div>
-                        <span id="status-writer" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs shadow">💻</div>
-                            <div>
-                                <h4 class="font-bold text-[11px] text-white">AI Fullstack Coder</h4>
-                                <p class="text-[9px] text-gray-400">Desk 2 (Ground Floor)</p>
-                            </div>
-                        </div>
-                        <span id="status-coder" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow">📊</div>
-                            <div>
-                                <h4 class="font-bold text-[11px] text-white">AI Data Analyst</h4>
-                                <p class="text-[9px] text-gray-400">Desk 3 (Ground Floor)</p>
-                            </div>
-                        </div>
-                        <span id="status-analyst" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
-                    </div>
+                    <button id="runBtn" onclick="runWorkflow()" class="px-3.5 py-2 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-semibold text-xs rounded-xl shadow-lg neon-glow-orange transition transform active:scale-95 flex items-center space-x-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Jalankan Workflow</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- BOTTOM HUD: Live Execution Stream -->
-        <footer class="pointer-events-auto glass-panel rounded-2xl p-3 shadow-2xl border-b-2 border-orange-500">
-            <div class="flex items-center justify-between mb-1 px-1">
-                <div class="flex items-center space-x-2">
-                    <div class="flex space-x-1">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
-                    </div>
-                    <span class="font-bold text-xs text-orange-400 tracking-wide uppercase">Live Agent Stream & Dialogue HUD</span>
-                </div>
-                <div class="text-[9px] text-gray-400 font-mono" id="streamBadge">Ready</div>
+        <!-- Live Agents Status Box (Collapsible) -->
+        <div class="glass-panel p-3.5 rounded-2xl pointer-events-auto">
+            <div class="flex items-center justify-between mb-2 cursor-pointer" onclick="togglePanel('workstation-body', 'workstation-arrow')">
+                <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between w-full">
+                    <span>Tim AI Workstation</span>
+                    <span class="text-orange-500 font-mono text-[9px] mr-2">3D ROBOTS ACTIVE</span>
+                </h3>
+                <svg id="workstation-arrow" class="w-4 h-4 text-slate-400 transform rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
-            <div id="logOutput" class="font-mono text-[11px] bg-slate-950/90 border border-slate-800/80 rounded-xl p-2.5 h-14 overflow-y-auto text-emerald-400 space-y-0.5">
-                [00:01] [SYSTEM]: 3D Office v9.0 Initialized. Robot dialogue system online.<br>
-                [00:02] [ORCA AI]: Masukkan master prompt untuk melihat percakapan robot 24/7.
-            </div>
-        </footer>
 
+            <div id="workstation-body" class="panel-transition space-y-2 max-h-[25vh] overflow-y-auto">
+                <!-- Boss Agent Card -->
+                <div class="p-2 rounded-xl bg-slate-900/70 border border-orange-500/30 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></div>
+                        <div>
+                            <div class="text-[11px] font-bold text-white">👑 Boss / Orchestrator</div>
+                            <div class="text-[9px] text-slate-400 font-mono">Mezzanine Deck</div>
+                        </div>
+                    </div>
+                    <span id="status-boss" class="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 font-mono">Standby</span>
+                </div>
+
+                <!-- Agent 1 -->
+                <div class="p-2 rounded-xl bg-slate-900/50 border border-white/5 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-200">✍️ AI Copywriter</div>
+                            <div class="text-[9px] text-slate-400 font-mono">Desk 1 (Robot Unit)</div>
+                        </div>
+                    </div>
+                    <span id="status-agent1" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">Idle</span>
+                </div>
+
+                <!-- Agent 2 -->
+                <div class="p-2 rounded-xl bg-slate-900/50 border border-white/5 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-200">💻 AI Fullstack Coder</div>
+                            <div class="text-[9px] text-slate-400 font-mono">Desk 2 (Robot Unit)</div>
+                        </div>
+                    </div>
+                    <span id="status-agent2" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">Idle</span>
+                </div>
+
+                <!-- Agent 3 -->
+                <div class="p-2 rounded-xl bg-slate-900/50 border border-white/5 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-200">🎨 AI UI/UX Designer</div>
+                            <div class="text-[9px] text-slate-400 font-mono">Desk 3 (Robot Unit)</div>
+                        </div>
+                    </div>
+                    <span id="status-agent3" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">Idle</span>
+                </div>
+
+                <!-- Agent 4 -->
+                <div class="p-2 rounded-xl bg-slate-900/50 border border-white/5 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-200">📊 AI Growth Marketer</div>
+                            <div class="text-[9px] text-slate-400 font-mono">Desk 4 (Robot Unit)</div>
+                        </div>
+                    </div>
+                    <span id="status-agent4" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">Idle</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Script JavaScript Three.js & Speech Bubble Sync -->
+    <!-- UI Overlay: Compact Floating HUD Terminal (Bottom Right) -->
+    <div class="absolute bottom-4 right-4 z-20 w-80 md:w-96 pointer-events-none">
+        <div class="glass-panel p-3 rounded-2xl pointer-events-auto border border-white/10 shadow-2xl">
+            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/10">
+                <div class="flex items-center space-x-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                    <span class="text-[11px] font-mono text-slate-300 ml-1 font-semibold">Live Agent Stream HUD</span>
+                </div>
+                <div class="text-[9px] font-mono text-orange-400 flex items-center space-x-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
+                    <span id="terminal-status">Ready</span>
+                </div>
+            </div>
+            <div id="terminal-log" class="font-mono text-[10px] text-emerald-400 h-20 overflow-y-auto space-y-1 p-2 bg-black/75 rounded-xl border border-white/5">
+                <div>[00:01] [SYSTEM]: Virtual Office v8.3 Initialized with 3D Robotic Agents & RGB PCs.</div>
+                <div>[00:02] [ORCA AI]: Ready for automated workflow dispatch.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-16 right-4 z-50 transform translate-x-96 opacity-0 transition-all duration-300 glass-panel border-l-4 border-orange-500 px-4 py-2.5 rounded-xl shadow-2xl flex items-center space-x-3">
+        <div class="text-orange-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+            <div id="toast-title" class="text-xs font-bold text-white">Informasi</div>
+            <div id="toast-msg" class="text-[10px] text-slate-300">Pesan sukses...</div>
+        </div>
+    </div>
+
+    <!-- Main JavaScript Logic -->
     <script>
-        function togglePanel(bodyId, iconId) {
+        // --- UI COLLAPSE FUNCTION ---
+        function togglePanel(bodyId, arrowId) {
             const body = document.getElementById(bodyId);
-            const icon = document.getElementById(iconId);
-            body.classList.toggle('collapsed');
-            icon.classList.toggle('rotate-180');
-        }
-
-        // Three.js Scene Setup
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050508);
-        scene.fog = new THREE.FogExp2(0x050508, 0.015);
-
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 14, 24);
-        camera.lookAt(0, 2, 0);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        container.appendChild(renderer.domElement);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0x1a233a, 1.5);
-        scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(10, 25, 15);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        const orangeNeon = new THREE.PointLight(0xf97316, 2, 35);
-        orangeNeon.position.set(0, 10, 0);
-        scene.add(orangeNeon);
-
-        // Floor
-        const floorGeo = new THREE.PlaneGeometry(60, 60);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.3, metalness: 0.8 });
-        const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        floor.receiveShadow = true;
-        scene.add(floor);
-
-        const gridHelper = new THREE.GridHelper(60, 30, 0xf97316, 0x1e293b);
-        gridHelper.position.y = 0.01;
-        scene.add(gridHelper);
-
-        // Mezzanine (Ruang Boss)
-        const mezzGeo = new THREE.BoxGeometry(26, 0.6, 10);
-        const mezzMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.4, metalness: 0.6 });
-        const mezzanine = new THREE.Mesh(mezzGeo, mezzMat);
-        mezzanine.position.set(0, 6, -8);
-        mezzanine.receiveShadow = true;
-        mezzanine.castShadow = true;
-        scene.add(mezzanine);
-
-        // Array untuk menyimpan referensi 3D robot agar posisi layarnya bisa dilacak ke HTML Bubble
-        const robotObjects = {};
-
-        function createRobotAgent(id, colorHex) {
-            const robotGroup = new THREE.Group();
-            
-            const torsoGeo = new THREE.BoxGeometry(0.8, 1.0, 0.5);
-            const torsoMat = new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.8, roughness: 0.2 });
-            const torso = new THREE.Mesh(torsoGeo, torsoMat);
-            torso.position.y = 0.5;
-            torso.castShadow = true;
-            robotGroup.add(torso);
-
-            const headGeo = new THREE.BoxGeometry(0.6, 0.5, 0.5);
-            const headMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: 0.9, roughness: 0.1 });
-            const head = new THREE.Mesh(headGeo, headMat);
-            head.position.y = 1.25;
-            head.castShadow = true;
-            robotGroup.add(head);
-
-            const visorGeo = new THREE.BoxGeometry(0.5, 0.15, 0.1);
-            const visorMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-            const visor = new THREE.Mesh(visorGeo, visorMat);
-            visor.position.set(0, 1.25, 0.22);
-            robotGroup.add(visor);
-
-            robotObjects[id] = robotGroup;
-            return robotGroup;
-        }
-
-        function createWorkstation(id, x, y, z, colorHex) {
-            const group = new THREE.Group();
-
-            const deskGeo = new THREE.BoxGeometry(3.5, 0.1, 1.8);
-            const deskMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.3 });
-            const desk = new THREE.Mesh(deskGeo, deskMat);
-            desk.position.set(0, 1.5, 0);
-            desk.castShadow = true;
-            group.add(desk);
-
-            const pcGeo = new THREE.BoxGeometry(0.6, 1.2, 1.0);
-            const pcMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9 });
-            const pc = new THREE.Mesh(pcGeo, pcMat);
-            pc.position.set(1.2, 2.2, 0);
-            group.add(pc);
-
-            const rgbStripGeo = new THREE.BoxGeometry(0.05, 1.0, 0.8);
-            const rgbMat = new THREE.MeshBasicMaterial({ color: colorHex });
-            const rgbStrip = new THREE.Mesh(rgbStripGeo, rgbMat);
-            rgbStrip.position.set(1.51, 2.2, 0);
-            group.add(rgbStrip);
-
-            const monGeo = new THREE.BoxGeometry(1.4, 0.8, 0.05);
-            const monMat = new THREE.MeshStandardMaterial({ color: 0x030712 });
-            const mon1 = new THREE.Mesh(monGeo, monMat);
-            mon1.position.set(-0.4, 2.2, -0.4);
-            group.add(mon1);
-
-            const robot = createRobotAgent(id, colorHex);
-            robot.position.set(0, 1.5, 0.5);
-            group.add(robot);
-
-            group.position.set(x, y, z);
-            scene.add(group);
-            return group;
-        }
-
-        // Spawn Boss di Ruangan Mezzanine (Lantai Atas) & Karyawan di Lantai Bawah
-        createWorkstation('boss', 0, 6, -8, 0xf97316);     // Ruang Boss
-        createWorkstation('writer', -7, 0, 4, 0x38bdf8);   // Karyawan 1 (Copywriter)
-        createWorkstation('coder', 0, 0, 4, 0x10b981);    // Karyawan 2 (Coder)
-        createWorkstation('analyst', 7, 0, 4, 0x8b5cf6);  // Karyawan 3 (Analyst)
-
-        // Update Posisi 3D Speech Bubble agar menempel di atas kepala robot secara real-time
-        const vector = new THREE.Vector3();
-        function updateSpeechBubbles() {
-            for (const id in robotObjects) {
-                const robot = robotObjects[id];
-                const bubble = document.getElementById(`bubble-${id}`);
-                if (!bubble) continue;
-
-                robot.getWorldPosition(vector);
-                vector.y += 1.8; // Posisi di atas kepala robot
-
-                vector.project(camera);
-
-                const x = (vector.x *  .5 + .5) * window.innerWidth;
-                const y = (vector.y * -.5 + .5) * window.innerHeight;
-
-                // Sembunyikan jika di luar layar / di belakang kamera
-                if (vector.z > 1) {
-                    bubble.style.display = 'none';
-                } else {
-                    bubble.style.display = 'block';
-                    bubble.style.transform = `translate(-50%, -100%) translate(${x}px, ${y}px)`;
-                }
+            const arrow = document.getElementById(arrowId);
+            if (body.style.maxHeight && body.style.maxHeight !== "0px") {
+                body.style.maxHeight = "0px";
+                body.style.opacity = "0";
+                arrow.style.transform = "rotate(0deg)";
+            } else {
+                body.style.maxHeight = body.scrollHeight + "px";
+                body.style.opacity = "1";
+                arrow.style.transform = "rotate(180deg)";
             }
-            requestAnimationFrame(updateSpeechBubbles);
         }
-        requestAnimationFrame(updateSpeechBubbles);
 
+        // --- THREE.JS SCENE SETUP ---
+        let scene, camera, renderer, controls;
+        let agents = [], flyingCars = [], rgbFans = [], dataLasers = [];
+        let clock = new THREE.Clock();
+        let isExecuting = false;
+
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020205);
+            scene.fog = new THREE.FogExp2(0x020205, 0.012);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 16, 32);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.3;
+            container.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.04;
+            controls.minDistance = 8;
+            controls.maxDistance = 55;
+            controls.target.set(0, 5, 0);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x151525, 1.8);
+            scene.add(ambientLight);
+
+            const mainDirLight = new THREE.DirectionalLight(0xffffff, 2.0);
+            mainDirLight.position.set(25, 35, 20);
+            mainDirLight.castShadow = true;
+            mainDirLight.shadow.mapSize.width = 2048;
+            mainDirLight.shadow.mapSize.height = 2048;
+            mainDirLight.shadow.bias = -0.0001;
+            scene.add(mainDirLight);
+
+            // Neon accent lights inside office
+            const orangeNeon = new THREE.PointLight(0xff6600, 3.5, 45);
+            orangeNeon.position.set(0, 14, 0);
+            scene.add(orangeNeon);
+
+            const cyanNeon = new THREE.PointLight(0x00f0ff, 3, 40);
+            cyanNeon.position.set(-14, 7, -8);
+            scene.add(cyanNeon);
+
+            const purpleNeon = new THREE.PointLight(0xb000ff, 3, 40);
+            purpleNeon.position.set(14, 7, -8);
+            scene.add(purpleNeon);
+
+            // Build Environment & City
+            buildOfficeInterior();
+            buildCyberpunkCity();
+
+            // Window resize handler
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation loop
+            animate();
+        }
+
+        // --- OFFICE INTERIOR & ARCHITECTURE ---
+        function buildOfficeInterior() {
+            // Reflective Main Floor (Ground Level)
+            const floorGeo = new THREE.BoxGeometry(38, 0.5, 24);
+            const floorMat = new THREE.MeshStandardMaterial({ 
+                color: 0x07080c, 
+                roughness: 0.15, 
+                metalness: 0.85 
+            });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.position.set(0, -0.25, 0);
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Glowing Grid Lines on Floor
+            const gridHelper = new THREE.GridHelper(38, 19, 0xff6600, 0x1a2233);
+            gridHelper.position.set(0, 0.01, 0);
+            scene.add(gridHelper);
+
+            // Mezzanine Floor (Upper Deck for Boss)
+            const mezzGeo = new THREE.BoxGeometry(22, 0.4, 11);
+            const mezzMat = new THREE.MeshStandardMaterial({ color: 0x111320, roughness: 0.3, metalness: 0.8 });
+            const mezzanine = new THREE.Mesh(mezzGeo, mezzMat);
+            mezzanine.position.set(0, 7, -5.5);
+            mezzanine.receiveShadow = true;
+            mezzanine.castShadow = true;
+            scene.add(mezzanine);
+
+            // Glass Railing for Mezzanine
+            const railingMat = new THREE.MeshPhysicalMaterial({ color: 0x00ffff, transparent: true, opacity: 0.45, roughness: 0.1, transmission: 0.9 });
+            const railingGeo = new THREE.BoxGeometry(21.8, 1.2, 0.2);
+            const railing = new THREE.Mesh(railingGeo, railingMat);
+            railing.position.set(0, 7.8, -0.1);
+            scene.add(railing);
+
+            // Stairs to Mezzanine
+            for (let i = 0; i < 8; i++) {
+                const stairGeo = new THREE.BoxGeometry(2.8, 0.2, 0.7);
+                const stairMat = new THREE.MeshStandardMaterial({ color: 0x1f293d, metalness: 0.8 });
+                const stair = new THREE.Mesh(stairGeo, stairMat);
+                stair.position.set(9.5, i * 0.87 + 0.4, 1.8 - i * 0.65);
+                stair.castShadow = true;
+                scene.add(stair);
+            }
+
+            // Panoramic Floor-to-Ceiling Back Glass Wall (Viewing Cyberpunk City)
+            const glassWallMat = new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.2, roughness: 0.05, transmission: 0.95 });
+            const glassWallGeo = new THREE.BoxGeometry(38, 14, 0.2);
+            const glassWall = new THREE.Mesh(glassWallGeo, glassWallMat);
+            glassWall.position.set(0, 7, -12);
+            scene.add(glassWall);
+
+            // --- WORKSTATIONS WITH GAMING PC SETUPS & 3D ROBOT AGENTS ---
+            createWorkstation(0, 7.2, -6.5, true, "👑 BOSS / ORCHESTRATOR", 0xff6600);
+
+            createWorkstation(-9, 0, 3.5, false, "✍️ AI COPYWRITER", 0x00f0ff);
+            createWorkstation(-3, 0, 3.5, false, "💻 AI FULLSTACK CODER", 0x10b981);
+            createWorkstation(3, 0, 3.5, false, "🎨 AI UI/UX DESIGNER", 0xa855f7);
+            createWorkstation(9, 0, 3.5, false, "📊 AI GROWTH MARKETER", 0xf59e0b);
+
+            // Holographic Lounge Table
+            const holoTableGeo = new THREE.CylinderGeometry(2.8, 3.2, 0.4, 32);
+            const holoTableMat = new THREE.MeshStandardMaterial({ color: 0x16192b, metalness: 0.9, roughness: 0.1 });
+            const holoTable = new THREE.Mesh(holoTableGeo, holoTableMat);
+            holoTable.position.set(0, 0.2, -2);
+            scene.add(holoTable);
+
+            const holoSphereGeo = new THREE.SphereGeometry(1.0, 32, 32);
+            const holoSphereMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.6 });
+            const holoSphere = new THREE.Mesh(holoSphereGeo, holoSphereMat);
+            holoSphere.position.set(0, 2.0, -2);
+            scene.add(holoSphere);
+            window.holoSphere = holoSphere;
+        }
+
+        // --- DETAILED GAMING PC & 3D ROBOT AGENT BUILDER ---
+        function createWorkstation(x, y, z, isBoss, nameLabel, accentColorHex) {
+            const deskGeo = new THREE.BoxGeometry(3.0, 0.15, 1.7);
+            const deskMat = new THREE.MeshStandardMaterial({ color: 0x0c0e14, roughness: 0.3, metalness: 0.8 });
+            const desk = new THREE.Mesh(deskGeo, deskMat);
+            desk.position.set(x, y + 1.2, z);
+            desk.castShadow = true;
+            desk.receiveShadow = true;
+            scene.add(desk);
+
+            const legGeo = new THREE.BoxGeometry(0.15, 1.2, 0.15);
+            const legMat = new THREE.MeshStandardMaterial({ color: 0x1f293d, metalness: 0.9 });
+            [-1.3, 1.3].forEach(lx => {
+                [-0.6, 0.6].forEach(lz => {
+                    const leg = new THREE.Mesh(legGeo, legMat);
+                    leg.position.set(x + lx, y + 0.6, z + lz);
+                    leg.castShadow = true;
+                    scene.add(leg);
+                });
+            });
+
+            // RGB Gaming PC Tower
+            const pcCaseGeo = new THREE.BoxGeometry(0.55, 1.1, 0.95);
+            const pcCaseMat = new THREE.MeshPhysicalMaterial({ color: 0x050508, roughness: 0.1, metalness: 0.8, transmission: 0.6, transparent: true, opacity: 0.8 });
+            const pcCase = new THREE.Mesh(pcCaseGeo, pcCaseMat);
+            pcCase.position.set(x + 1.05, y + 1.85, z - 0.2);
+            pcCase.castShadow = true;
+            scene.add(pcCase);
+
+            const fanGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 16);
+            const fanMat = new THREE.MeshBasicMaterial({ color: accentColorHex });
+            const fan = new THREE.Mesh(fanGeo, fanMat);
+            fan.position.set(x + 1.05, y + 1.9, z - 0.2);
+            fan.rotation.x = Math.PI / 2;
+            scene.add(fan);
+            rgbFans.push(fan);
+
+            const pcLight = new THREE.PointLight(accentColorHex, 2.5, 2.5);
+            pcLight.position.set(x + 1.05, y + 1.85, z - 0.2);
+            scene.add(pcLight);
+
+            // Dual Curved Monitors
+            const monitorMat = new THREE.MeshStandardMaterial({ color: 0x020203, roughness: 0.2, metalness: 0.8 });
+            
+            const mon1 = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.75, 0.05), monitorMat);
+            mon1.position.set(x - 0.4, y + 2.05, z - 0.5);
+            mon1.rotation.y = 0.22;
+            scene.add(mon1);
+
+            const mon2 = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.75, 0.05), monitorMat);
+            mon2.position.set(x + 0.4, y + 2.05, z - 0.5);
+            mon2.rotation.y = -0.22;
+            scene.add(mon2);
+
+            const screenMat = new THREE.MeshBasicMaterial({ color: accentColorHex });
+            const screen1 = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.65), screenMat);
+            screen1.position.set(x - 0.4, y + 2.05, z - 0.47);
+            screen1.rotation.y = 0.22;
+            scene.add(screen1);
+
+            const screen2 = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.65), screenMat);
+            screen2.position.set(x + 0.4, y + 2.05, z - 0.47);
+            screen2.rotation.y = -0.22;
+            scene.add(screen2);
+
+            const kb = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.03, 0.3), new THREE.MeshStandardMaterial({ color: 0x1f2937 }));
+            kb.position.set(x, y + 1.28, z - 0.1);
+            scene.add(kb);
+
+            const pad = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.01, 0.75), new THREE.MeshStandardMaterial({ color: 0x0a0f1d }));
+            pad.position.set(x, y + 1.27, z);
+            scene.add(pad);
+
+            // Ergonomic Gaming Chair
+            const seat = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.15, 0.85), new THREE.MeshStandardMaterial({ color: 0x14141f }));
+            seat.position.set(x, y + 0.7, z + 0.8);
+            seat.castShadow = true;
+            
+            const back = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.2, 0.15), new THREE.MeshStandardMaterial({ color: 0x14141f }));
+            back.position.set(x, y + 1.35, z + 1.18);
+            back.rotation.x = -0.1;
+            back.castShadow = true;
+
+            const chairGroup = new THREE.Group();
+            chairGroup.add(seat);
+            chairGroup.add(back);
+            scene.add(chairGroup);
+
+            // Fully Modeled 3D Robotic AI Agent (Cyberpunk Android with Glowing Visor)
+            const botGroup = new THREE.Group();
+            const robotMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.2 });
+
+            // Torso
+            const botTorso = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.3), robotMat);
+            botTorso.position.set(x, y + 1.1, z + 0.7);
+            botTorso.castShadow = true;
+            botGroup.add(botTorso);
+
+            // Chest Reactor Core Light
+            const reactorMat = new THREE.MeshBasicMaterial({ color: accentColorHex });
+            const reactor = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.05, 16), reactorMat);
+            reactor.position.set(x, y + 1.1, z + 0.54);
+            reactor.rotation.x = Math.PI / 2;
+            botGroup.add(reactor);
+
+            // Head
+            const botHead = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.38, 0.38), robotMat);
+            botHead.position.set(x, y + 1.62, z + 0.7);
+            botHead.castShadow = true;
+            botGroup.add(botHead);
+
+            // Glowing Visor Eyes
+            const visorMat = new THREE.MeshBasicMaterial({ color: accentColorHex });
+            const visor = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.1, 0.1), visorMat);
+            visor.position.set(x, y + 1.65, z + 0.52);
+            botGroup.add(visor);
+
+            // Arms typing
+            const armMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8 });
+            const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), armMat);
+            leftArm.position.set(x - 0.32, y + 1.25, z + 0.35);
+            botGroup.add(leftArm);
+
+            const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), armMat);
+            rightArm.position.set(x + 0.32, y + 1.25, z + 0.35);
+            botGroup.add(rightArm);
+
+            scene.add(botGroup);
+            agents.push({ group: botGroup, originalZ: z + 0.7, isBoss: isBoss });
+
+            createFloatingLabel(x, y + 2.4, z, nameLabel, accentColorHex);
+        }
+
+        function createFloatingLabel(x, y, z, text, colorHex) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 320;
+            canvas.height = 100;
+            ctx.fillStyle = 'rgba(10, 10, 20, 0.85)';
+            ctx.roundRect(10, 10, 300, 80, 16);
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#' + new THREE.Color(colorHex).getHexString();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 160, 50);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(2.2, 0.7, 1);
+            sprite.position.set(x, y + 0.5, z);
+            scene.add(sprite);
+        }
+
+        // --- CYBERPUNK CITY ---
+        function buildCyberpunkCity() {
+            const cityGroup = new THREE.Group();
+            const bldMat = new THREE.MeshStandardMaterial({ color: 0x05060a, roughness: 0.8 });
+
+            for (let i = 0; i < 40; i++) {
+                const w = 4 + Math.random() * 6;
+                const h = 20 + Math.random() * 50;
+                const d = 4 + Math.random() * 6;
+                const bld = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bldMat);
+                
+                const x = (Math.random() - 0.5) * 140;
+                const z = -45 - Math.random() * 50;
+                bld.position.set(x, h / 2 - 10, z);
+                cityGroup.add(bld);
+            }
+            scene.add(cityGroup);
+
+            const carGeo = new THREE.BoxGeometry(1.5, 0.3, 3.0);
+            const carMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+            for (let i = 0; i < 12; i++) {
+                const car = new THREE.Mesh(carGeo, carMat);
+                car.position.set((Math.random() - 0.5) * 100, 4 + Math.random() * 25, -25 - Math.random() * 35);
+                scene.add(car);
+                flyingCars.push({ mesh: car, speed: 0.25 + Math.random() * 0.45 });
+            }
+        }
+
+        // --- ANIMATION LOOP ---
         function animate() {
             requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            const elapsedTime = clock.getElapsedTime();
+
+            if (window.holoSphere) {
+                window.holoSphere.rotation.y = elapsedTime * 0.6;
+            }
+
+            rgbFans.forEach(fan => {
+                fan.rotation.z += 0.08;
+            });
+
+            flyingCars.forEach(car => {
+                car.mesh.position.x += car.speed;
+                if (car.mesh.position.x > 70) car.mesh.position.x = -70;
+            });
+
+            agents.forEach((agent, idx) => {
+                if (isExecuting) {
+                    agent.group.position.y = Math.sin(elapsedTime * 25 + idx) * 0.06;
+                } else {
+                    agent.group.position.y = Math.sin(elapsedTime * 2 + idx) * 0.025;
+                }
+            });
+
+            controls.update();
             renderer.render(scene, camera);
         }
-        animate();
 
-        function resetCamera() {
-            camera.position.set(0, 14, 24);
-            camera.lookAt(0, 2, 0);
-        }
-
-        window.addEventListener('resize', () => {
+        function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        }
 
-        // Simulasi Workflow & Dialog Robot Interaktif
+        // --- CAMERA PRESETS ---
+        function camPreset(targetName) {
+            switch(targetName) {
+                case 'overview':
+                    gsap.to(camera.position, { x: 0, y: 16, z: 32, duration: 1.8, ease: "power2.inOut" });
+                    controls.target.set(0, 5, 0);
+                    break;
+                case 'boss':
+                    gsap.to(camera.position, { x: 0, y: 10, z: -1, duration: 1.8, ease: "power2.inOut" });
+                    controls.target.set(0, 7.2, -6.5);
+                    break;
+                case 'team':
+                    gsap.to(camera.position, { x: 0, y: 5, z: 12, duration: 1.8, ease: "power2.inOut" });
+                    controls.target.set(0, 2, 3.5);
+                    break;
+                case 'city':
+                    gsap.to(camera.position, { x: 0, y: 12, z: -25, duration: 1.8, ease: "power2.inOut" });
+                    controls.target.set(0, 7, -12);
+                    break;
+            }
+        }
+
+        function resetCamera() {
+            camPreset('overview');
+        }
+
+        // --- WORKFLOW ORCHESTRATION ---
         async function runWorkflow() {
-            const task = document.getElementById('taskInput').value;
-            const logOutput = document.getElementById('logOutput');
-            const commandBadge = document.getElementById('commandBadge');
-            
-            const statusBoss = document.getElementById('status-boss');
-            const statusWriter = document.getElementById('status-writer');
-            const statusCoder = document.getElementById('status-coder');
-            const statusAnalyst = document.getElementById('status-analyst');
-
-            const bBoss = document.getElementById('bubble-boss');
-            const bWriter = document.getElementById('bubble-writer');
-            const bCoder = document.getElementById('bubble-coder');
-            const bAnalyst = document.getElementById('bubble-analyst');
-
-            if (!task.trim()) {
-                alert("Masukkan perintah master terlebih dahulu, Bro!");
+            const taskInput = document.getElementById('taskInput').value;
+            if (!taskInput.trim()) {
+                showToast("Peringatan", "Masukkan perintah tugas terlebih dahulu!");
                 return;
             }
 
-            document.getElementById('runBtn').disabled = true;
-            commandBadge.innerText = "RUNNING";
-            commandBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-mono animate-pulse";
+            if (isExecuting) return;
+            isExecuting = true;
 
-            // Step 1: Boss Menerima Perintah
-            statusBoss.innerText = "Working";
-            statusBoss.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/40 animate-pulse";
-            bBoss.innerText = `👑 Boss: "Menerima tugas: ${task.substring(0, 18)}..."`;
-            bBoss.classList.add('active');
-            logOutput.innerHTML += `<br>[00:03] [BOSS]: Menganalisis perintah utama...`;
-            logOutput.scrollTop = logOutput.scrollHeight;
-            await sleep(2500);
+            const runBtn = document.getElementById('runBtn');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50');
 
-            // Step 2: Boss mendelegasikan ke Analyst
-            bBoss.innerText = `👑 Boss: "Analyst, tolong riset data market sekarang!"`;
-            await sleep(1500);
+            const terminalStatus = document.getElementById('terminal-status');
+            terminalStatus.innerText = "Running...";
+            terminalStatus.className = "text-[9px] font-mono text-orange-400 animate-pulse";
 
-            statusAnalyst.innerText = "Working";
-            statusAnalyst.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/40 animate-pulse";
-            bAnalyst.innerText = `📊 Analyst: "Baik Boss, meriset metrik market..."`;
-            bAnalyst.classList.add('active');
-            logOutput.innerHTML += `<br>[00:06] [ANALYST]: Melakukan riset data & market intelligence...`;
-            logOutput.scrollTop = logOutput.scrollHeight;
-            await sleep(2500);
+            document.getElementById('status-boss').innerText = "Working";
+            document.getElementById('status-boss').className = "text-[9px] px-1.5 py-0.5 rounded bg-orange-500 text-white font-mono font-bold animate-pulse";
 
-            // Step 3: Delegasi ke Copywriter
-            bBoss.innerText = `👑 Boss: "Copywriter, susun draf kontennya!"`;
-            await sleep(1500);
+            appendLog(`[${getTime()}] 👑 Boss: "${taskInput}"`);
 
-            statusWriter.innerText = "Working";
-            statusWriter.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/40 animate-pulse";
-            bWriter.innerText = `✍️ Writer: "Siap! Menyusun copywriting menarik..."`;
-            bWriter.classList.add('active');
-            logOutput.innerHTML += `<br>[00:09] [WRITER]: Menyusun draf konten pemasaran otomatis...`;
-            logOutput.scrollTop = logOutput.scrollHeight;
-            await sleep(2500);
+            camPreset('boss');
+            await sleep(2000);
 
-            // Step 4: Delegasi ke Coder
-            bBoss.innerText = `👑 Boss: "Coder, deploy automation script!"`;
-            await sleep(1500);
+            appendLog(`[${getTime()}] 🔄 Delegating tasks to 3D robotic AI team...`);
+            createDataLasers();
 
-            statusCoder.innerText = "Working";
-            statusCoder.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse";
-            bCoder.innerText = `💻 Coder: "Deploying API & script 24/7..."`;
-            bCoder.classList.add('active');
-            logOutput.innerHTML += `<br>[00:12] [CODER]: Mendeploy automation script & endpoint...`;
-            logOutput.scrollTop = logOutput.scrollHeight;
-            await sleep(3000);
+            document.getElementById('status-boss').innerText = "Monitoring";
+            document.getElementById('status-boss').className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono";
 
-            // Completion
-            statusBoss.innerText = "Done";
-            statusBoss.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
-            bBoss.innerText = `👑 Boss: "Kerja bagus tim! Semua sukses."`;
-            
-            statusAnalyst.innerText = "Idle"; statusAnalyst.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
-            statusWriter.innerText = "Idle"; statusWriter.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
-            statusCoder.innerText = "Idle"; statusCoder.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
+            camPreset('team');
+
+            setActiveAgent('status-agent1', 'Writing');
+            appendLog(`[${getTime()}] ✍️ Copywriter drafting content...`);
+            await sleep(2000);
+
+            setActiveAgent('status-agent2', 'Coding');
+            appendLog(`[${getTime()}] 💻 Coder compiling backend...`);
+            await sleep(2000);
+
+            setActiveAgent('status-agent3', 'Designing');
+            appendLog(`[${getTime()}] 🎨 Designer rendering UI...`);
+            await sleep(2000);
+
+            setActiveAgent('status-agent4', 'Analyzing');
+            appendLog(`[${getTime()}] 📊 Marketer running growth metrics...`);
+            await sleep(2000);
+
+            appendLog(`[${getTime()}] ✅ All 3D AI robotic agents successfully completed tasks!`);
+            terminalStatus.innerText = "Completed";
+            terminalStatus.className = "text-[9px] font-mono text-emerald-400";
+
+            document.getElementById('status-agent1').innerText = "Done";
+            document.getElementById('status-agent2').innerText = "Done";
+            document.getElementById('status-agent3').innerText = "Done";
+            document.getElementById('status-agent4').innerText = "Done";
+
+            showToast("Sukses!", "Workflow AI berhasil diselesaikan oleh seluruh tim robot 3D.");
 
             setTimeout(() => {
-                bAnalyst.classList.remove('active');
-                bWriter.classList.remove('active');
-                bCoder.classList.remove('active');
-            }, 3000);
-
-            commandBadge.innerText = "COMPLETED";
-            commandBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono";
-            logOutput.innerHTML += `<br>[00:15] [SUCCESS]: Seluruh tim AI selesai mengeksekusi workflow 24/7.`;
-            logOutput.scrollTop = logOutput.scrollHeight;
-
-            document.getElementById('runBtn').disabled = false;
+                resetCamera();
+                isExecuting = false;
+                runBtn.disabled = false;
+                runBtn.classList.remove('opacity-50');
+            }, 3500);
         }
 
-        function clearWorkflow() {
-            document.getElementById('taskInput').value = "";
-            document.getElementById('logOutput').innerHTML = `[00:01] [SYSTEM]: Workspace reset. Ready...`;
-            document.getElementById('commandBadge').innerText = "READY";
-            document.getElementById('commandBadge').className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono";
-            
-            ['boss', 'writer', 'coder', 'analyst'].forEach(agent => {
-                const el = document.getElementById(`status-${agent}`);
-                el.innerText = agent === 'boss' ? 'Standby' : 'Idle';
-                el.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
-                document.getElementById(`bubble-${agent}`).classList.remove('active');
+        function createDataLasers() {
+            const laserMat = new THREE.LineBasicMaterial({ color: 0xff6600, linewidth: 4 });
+            const targets = [-9, -3, 3, 9];
+
+            targets.forEach(tx => {
+                const points = [];
+                points.push(new THREE.Vector3(0, 7.2, -6.5));
+                points.push(new THREE.Vector3(tx, 1.8, 3.5));
+
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geometry, laserMat);
+                scene.add(line);
+                dataLasers.push(line);
+
+                setTimeout(() => {
+                    scene.remove(line);
+                }, 3500);
             });
+        }
+
+        function setActiveAgent(elementId, statusText) {
+            const badge = document.getElementById(elementId);
+            badge.innerText = statusText;
+            badge.className = "text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono animate-pulse";
+        }
+
+        function appendLog(text) {
+            const term = document.getElementById('terminal-log');
+            const div = document.createElement('div');
+            div.innerText = text;
+            term.appendChild(div);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function getTime() {
+            const d = new Date();
+            return d.toTimeString().split(' ')[0];
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-x-96', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-x-96', 'opacity-0');
+            }, 4000);
         }
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
+
+        window.onload = () => {
+            init3D();
+            // Initialize panel max heights
+            document.getElementById('command-body').style.maxHeight = document.getElementById('command-body').scrollHeight + "px";
+            document.getElementById('workstation-body').style.maxHeight = document.getElementById('workstation-body').scrollHeight + "px";
+        };
     </script>
 </body>
 </html>
+```
+eof
