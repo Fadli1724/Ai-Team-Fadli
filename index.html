@@ -1,10 +1,9 @@
-index.html
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORCA AI v7.1 - 3D Cyberpunk Virtual Office</title>
+    <title>ORCA AI v8.3 - Ultimate 3D Cyberpunk Virtual Office</title>
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,12 +13,11 @@ index.html
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050508; color: #f3f4f6; overflow: hidden; }
         .font-mono { font-family: 'Fira Code', monospace; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         ::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.5); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(249, 115, 22, 0.8); }
-        .glass-panel { background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .collapsible-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 500px; opacity: 1; overflow: hidden; }
+        .glass-panel { background: rgba(13, 17, 23, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .collapsible-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 450px; opacity: 1; overflow: hidden; }
         .collapsible-content.collapsed { max-height: 0 !important; opacity: 0; padding-top: 0 !important; padding-bottom: 0 !important; margin: 0 !important; border: none !important; }
     </style>
 </head>
@@ -38,125 +36,120 @@ index.html
                     <i class="fa-solid fa-cube text-white text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg tracking-wide bg-gradient-to-r from-orange-400 to-amber-200 bg-clip-text text-transparent">ORCA AI <span class="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">v7.1 3D Office</span></h1>
-                    <p class="text-xs text-gray-400">Autonomous Multi-Agent Orchestrator & 3D Virtual Workspace</p>
+                    <h1 class="font-extrabold text-base tracking-wide bg-gradient-to-r from-orange-400 to-amber-200 bg-clip-text text-transparent">
+                        ORCA AI <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">v8.3 ULTIMATE</span>
+                    </h1>
+                    <p class="text-[11px] text-gray-400">Cinematic 3D Virtual Office & RGB Gaming PCs</p>
                 </div>
             </div>
             
             <div class="flex items-center space-x-3">
                 <button onclick="resetCamera()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-orange-400 border border-slate-700 transition flex items-center space-x-1.5 shadow-md">
-                    <i class="fa-solid fa-video"></i><span>Reset Cam</span>
+                    <i class="fa-solid fa-video"></i><span>Reset</span>
                 </button>
-                <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>System Online (24/7)</span>
-                </div>
+                <a href="#ambil-akses" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-xs font-bold text-white shadow-lg shadow-orange-500/30 transition">
+                    Ambil Akses
+                </a>
             </div>
         </header>
 
         <!-- MAIN FLOATING PANELS -->
-        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 my-4 pointer-events-none items-start overflow-hidden">
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 my-3 pointer-events-none items-start overflow-hidden">
             
             <!-- LEFT COLUMN: Orchestrator Command Center (Collapsible) -->
-            <div class="lg:col-span-4 pointer-events-auto glass-panel rounded-2xl p-5 shadow-2xl border-l-4 border-orange-500 flex flex-col">
-                <div class="flex items-center justify-between pb-3 border-b border-white/10 cursor-pointer" onclick="togglePanel('command-body', 'command-icon')">
-                    <div class="flex items-center space-x-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
-                            <i class="fa-solid fa-terminal text-sm"></i>
+            <div class="lg:col-span-4 pointer-events-auto glass-panel rounded-2xl p-4 shadow-2xl border-l-4 border-orange-500 flex flex-col">
+                <div class="flex items-center justify-between pb-2.5 border-b border-white/10 cursor-pointer" onclick="togglePanel('command-body', 'command-icon')">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400">
+                            <i class="fa-solid fa-terminal text-xs"></i>
                         </div>
-                        <h2 class="font-bold text-sm tracking-wide text-white">Orchestrator Command Center</h2>
+                        <h2 class="font-bold text-xs tracking-wide text-white">Orchestrator Command Center</h2>
                     </div>
-                    <button class="text-gray-400 hover:text-white transition p-1">
-                        <i id="command-icon" class="fa-solid fa-chevron-up transition-transform duration-300"></i>
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <span id="commandBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">READY</span>
+                        <i id="command-icon" class="fa-solid fa-chevron-up text-gray-400 transition-transform duration-300 text-xs"></i>
+                    </div>
                 </div>
 
-                <div id="command-body" class="collapsible-content pt-4 space-y-4">
+                <div id="command-body" class="collapsible-content pt-3 space-y-3">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1.5">Master Prompt / Perintah Utama:</label>
-                        <textarea id="taskInput" class="w-full h-24 bg-slate-900/90 border border-slate-700/80 rounded-xl p-3 text-xs text-gray-200 focus:outline-none focus:border-orange-500 transition resize-none font-mono shadow-inner" placeholder="Contoh: Buatkan riset tren pasar crypto & draf strategi marketing AI agent..."></textarea>
+                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">Master Prompt / Perintah Utama:</label>
+                        <textarea id="taskInput" class="w-full h-20 bg-slate-900/90 border border-slate-700/80 rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-orange-500 transition resize-none font-mono shadow-inner" placeholder="Contoh: Buatkan riset tren market & draf strategi 24/7..."></textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="runWorkflow()" id="runBtn" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition flex items-center justify-center space-x-2">
+                        <button onclick="runWorkflow()" id="runBtn" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-play"></i><span>Jalankan Tim</span>
                         </button>
-                        <button onclick="clearWorkflow()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 font-semibold text-xs border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <button onclick="clearWorkflow()" class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 font-semibold text-xs border border-slate-700 transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-rotate-right"></i><span>Reset</span>
                         </button>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-gray-400 space-y-1">
-                        <div class="flex justify-between font-semibold text-gray-300">
-                            <span>Workflow Status:</span>
-                            <span id="workflowStatusText" class="text-amber-400">Standby</span>
-                        </div>
-                        <p>Orchestrator mendistribusikan tugas ke AI Agent secara otomatis 24/7.</p>
                     </div>
                 </div>
             </div>
 
             <!-- RIGHT COLUMN: Tim AI Workstation (Collapsible) -->
-            <div class="lg:col-span-4 lg:col-start-9 pointer-events-auto glass-panel rounded-2xl p-5 shadow-2xl border-l-4 border-amber-500 flex flex-col">
-                <div class="flex items-center justify-between pb-3 border-b border-white/10 cursor-pointer" onclick="togglePanel('workstation-body', 'workstation-icon')">
-                    <div class="flex items-center space-x-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
-                            <i class="fa-solid fa-users-gear text-sm"></i>
+            <div class="lg:col-span-4 lg:col-start-9 pointer-events-auto glass-panel rounded-2xl p-4 shadow-2xl border-l-4 border-amber-500 flex flex-col">
+                <div class="flex items-center justify-between pb-2.5 border-b border-white/10 cursor-pointer" onclick="togglePanel('workstation-body', 'workstation-icon')">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-users-gear text-xs"></i>
                         </div>
-                        <h2 class="font-bold text-sm tracking-wide text-white">Tim AI Workstation</h2>
+                        <h2 class="font-bold text-xs tracking-wide text-white">TIM AI WORKSTATION</h2>
                     </div>
-                    <button class="text-gray-400 hover:text-white transition p-1">
-                        <i id="workstation-icon" class="fa-solid fa-chevron-up transition-transform duration-300"></i>
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[9px] text-amber-400 font-semibold">3D ROBOTS ACTIVE</span>
+                        <i id="workstation-icon" class="fa-solid fa-chevron-up text-gray-400 transition-transform duration-300 text-xs"></i>
+                    </div>
                 </div>
 
-                <div id="workstation-body" class="collapsible-content pt-4 space-y-3 max-h-[320px] overflow-y-auto pr-1">
-                    <!-- Boss Agent -->
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-xs font-bold shadow">👑</div>
+                <div id="workstation-body" class="collapsible-content pt-3 space-y-2 max-h-[260px] overflow-y-auto pr-1">
+                    <!-- Boss -->
+                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-xs shadow">👑</div>
                             <div>
-                                <h4 class="font-bold text-xs text-white">Orchestrator Boss</h4>
-                                <p class="text-[10px] text-gray-400">Manager & Task Splitter</p>
+                                <h4 class="font-bold text-[11px] text-white">Boss / Orchestrator</h4>
+                                <p class="text-[9px] text-gray-400">Mezzanine Deck</p>
                             </div>
                         </div>
-                        <span id="status-boss" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
+                        <span id="status-boss" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Standby</span>
                     </div>
 
-                    <!-- Copywriter Agent -->
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xs font-bold shadow">✍️</div>
+                    <!-- Copywriter -->
+                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xs shadow">✍️</div>
                             <div>
-                                <h4 class="font-bold text-xs text-white">AI Copywriter</h4>
-                                <p class="text-[10px] text-gray-400">Content & Social Media</p>
+                                <h4 class="font-bold text-[11px] text-white">AI Copywriter</h4>
+                                <p class="text-[9px] text-gray-400">Desk 1 (Robot Unit)</p>
                             </div>
                         </div>
-                        <span id="status-writer" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
+                        <span id="status-writer" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
                     </div>
 
-                    <!-- Coder Agent -->
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold shadow">💻</div>
+                    <!-- Coder -->
+                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs shadow">💻</div>
                             <div>
-                                <h4 class="font-bold text-xs text-white">AI Coder</h4>
-                                <p class="text-[10px] text-gray-400">Script & Web Dev</p>
+                                <h4 class="font-bold text-[11px] text-white">AI Fullstack Coder</h4>
+                                <p class="text-[9px] text-gray-400">Desk 2 (Robot Unit)</p>
                             </div>
                         </div>
-                        <span id="status-coder" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
+                        <span id="status-coder" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
                     </div>
 
-                    <!-- Analyst Agent -->
-                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow">📊</div>
+                    <!-- Analyst -->
+                    <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow">📊</div>
                             <div>
-                                <h4 class="font-bold text-xs text-white">AI Data Analyst</h4>
-                                <p class="text-[10px] text-gray-400">Research & Metrics</p>
+                                <h4 class="font-bold text-[11px] text-white">AI Data Analyst</h4>
+                                <p class="text-[9px] text-gray-400">Desk 3 (Robot Unit)</p>
                             </div>
                         </div>
-                        <span id="status-analyst" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
+                        <span id="status-analyst" class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700">Idle</span>
                     </div>
                 </div>
             </div>
@@ -164,15 +157,20 @@ index.html
 
         <!-- BOTTOM HUD: Live Execution Stream (Compact) -->
         <footer class="pointer-events-auto glass-panel rounded-2xl p-3 shadow-2xl border-b-2 border-orange-500">
-            <div class="flex items-center justify-between mb-1.5 px-1">
+            <div class="flex items-center justify-between mb-1 px-1">
                 <div class="flex items-center space-x-2">
-                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                    <span class="font-bold text-xs text-orange-400 tracking-wide uppercase">Live Agent Execution Stream</span>
+                    <div class="flex space-x-1">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                    </div>
+                    <span class="font-bold text-xs text-orange-400 tracking-wide uppercase">Live Agent Stream HUD</span>
                 </div>
-                <div class="text-[10px] text-gray-400 font-mono" id="timestamp">2026-10-26 15:03:00</div>
+                <div class="text-[9px] text-gray-400 font-mono" id="streamBadge">Ready</div>
             </div>
-            <div id="logOutput" class="font-mono text-xs bg-slate-950/80 border border-slate-800/80 rounded-xl p-2.5 h-16 overflow-y-auto text-emerald-400 space-y-1">
-                [00:00:01] 🏢 ORCA AI Virtual Office 3D v7.1 initialized. 3D Robotic Agents deployed at desks. Ready for command...
+            <div id="logOutput" class="font-mono text-[11px] bg-slate-950/90 border border-slate-800/80 rounded-xl p-2.5 h-14 overflow-y-auto text-emerald-400 space-y-0.5">
+                [00:01] [SYSTEM]: Virtual Office v8.3 Initialized with 3D Robotic Agents & RGB PCs.<br>
+                [00:02] [ORCA AI]: Ready for automated workflow dispatch.
             </div>
         </footer>
 
@@ -223,7 +221,7 @@ index.html
         blueNeon.position.set(-10, 8, -5);
         scene.add(blueNeon);
 
-        // Floor (Reflective Dark Grid)
+        // Floor
         const floorGeo = new THREE.PlaneGeometry(60, 60);
         const floorMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.3, metalness: 0.8 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -235,7 +233,7 @@ index.html
         gridHelper.position.y = 0.01;
         scene.add(gridHelper);
 
-        // Mezzanine / 2nd Floor Balcony
+        // Mezzanine Deck
         const mezzGeo = new THREE.BoxGeometry(26, 0.6, 10);
         const mezzMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.4, metalness: 0.6 });
         const mezzanine = new THREE.Mesh(mezzGeo, mezzMat);
@@ -244,11 +242,10 @@ index.html
         mezzanine.castShadow = true;
         scene.add(mezzanine);
 
-        // Function to create a 3D Robotic Agent
+        // 3D Robotic Agent
         function createRobotAgent(colorHex) {
             const robotGroup = new THREE.Group();
             
-            // Body / Torso
             const torsoGeo = new THREE.BoxGeometry(0.8, 1.0, 0.5);
             const torsoMat = new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.8, roughness: 0.2 });
             const torso = new THREE.Mesh(torsoGeo, torsoMat);
@@ -256,7 +253,6 @@ index.html
             torso.castShadow = true;
             robotGroup.add(torso);
 
-            // Head with Glowing Visor
             const headGeo = new THREE.BoxGeometry(0.6, 0.5, 0.5);
             const headMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: 0.9, roughness: 0.1 });
             const head = new THREE.Mesh(headGeo, headMat);
@@ -264,14 +260,12 @@ index.html
             head.castShadow = true;
             robotGroup.add(head);
 
-            // Glowing Visor Eyes
             const visorGeo = new THREE.BoxGeometry(0.5, 0.15, 0.1);
             const visorMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
             const visor = new THREE.Mesh(visorGeo, visorMat);
             visor.position.set(0, 1.25, 0.22);
             robotGroup.add(visor);
 
-            // Arms
             const armGeo = new THREE.BoxGeometry(0.2, 0.8, 0.2);
             const armMat = new THREE.MeshStandardMaterial({ color: 0x374151, metalness: 0.8 });
             
@@ -286,11 +280,10 @@ index.html
             return robotGroup;
         }
 
-        // Function to create Gaming PC & Desk Workstation
+        // Workstation with RGB PC
         function createWorkstation(x, z, name, colorHex) {
             const group = new THREE.Group();
 
-            // Desk
             const deskGeo = new THREE.BoxGeometry(3.5, 0.1, 1.8);
             const deskMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.3 });
             const desk = new THREE.Mesh(deskGeo, deskMat);
@@ -299,7 +292,6 @@ index.html
             desk.receiveShadow = true;
             group.add(desk);
 
-            // Desk Legs
             const legGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.5);
             const legMat = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.9 });
             
@@ -311,7 +303,6 @@ index.html
                 });
             });
 
-            // Gaming PC Tower with RGB Glow
             const pcGeo = new THREE.BoxGeometry(0.6, 1.2, 1.0);
             const pcMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.1 });
             const pc = new THREE.Mesh(pcGeo, pcMat);
@@ -324,7 +315,6 @@ index.html
             rgbStrip.position.set(1.51, 2.2, 0);
             group.add(rgbStrip);
 
-            // Dual Monitors
             const monGeo = new THREE.BoxGeometry(1.4, 0.8, 0.05);
             const monMat = new THREE.MeshStandardMaterial({ color: 0x030712, roughness: 0.2 });
             
@@ -336,7 +326,6 @@ index.html
             mon2.position.set(0.8, 2.2, -0.4);
             group.add(mon2);
 
-            // Add 3D Robot Sitting at Desk
             const robot = createRobotAgent(colorHex);
             robot.position.set(0, 1.5, 0.5);
             group.add(robot);
@@ -346,37 +335,32 @@ index.html
             return group;
         }
 
-        // Spawn Workstations & Robots in Office
-        createWorkstation(0, -8, "Orchestrator Boss", 0xf97316); // Mezzanine Center (Boss)
-        createWorkstation(-7, 4, "AI Copywriter", 0x38bdf8);      // Ground Floor Left
-        createWorkstation(0, 4, "AI Coder", 0x10b981);           // Ground Floor Center
-        createWorkstation(7, 4, "AI Data Analyst", 0x8b5cf6);     // Ground Floor Right
+        createWorkstation(0, -8, "Orchestrator Boss", 0xf97316);
+        createWorkstation(-7, 4, "AI Copywriter", 0x38bdf8);
+        createWorkstation(0, 4, "AI Coder", 0x10b981);
+        createWorkstation(7, 4, "AI Data Analyst", 0x8b5cf6);
 
-        // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }
         animate();
 
-        // Camera Reset
         function resetCamera() {
             camera.position.set(0, 14, 24);
             camera.lookAt(0, 2, 0);
         }
 
-        // Window Resize Listener
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Interactive Workflow Simulation Engine
         async function runWorkflow() {
             const task = document.getElementById('taskInput').value;
             const logOutput = document.getElementById('logOutput');
-            const statusText = document.getElementById('workflowStatusText');
+            const commandBadge = document.getElementById('commandBadge');
             
             const statusBoss = document.getElementById('status-boss');
             const statusWriter = document.getElementById('status-writer');
@@ -384,55 +368,50 @@ index.html
             const statusAnalyst = document.getElementById('status-analyst');
 
             if (!task.trim()) {
-                alert("Masukkan perintah tugas terlebih dahulu, Bro!");
+                alert("Masukkan perintah master terlebih dahulu, Bro!");
                 return;
             }
 
             document.getElementById('runBtn').disabled = true;
-            statusText.innerText = "Running...";
-            statusText.className = "text-amber-400 animate-pulse";
+            commandBadge.innerText = "RUNNING";
+            commandBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-mono animate-pulse";
 
-            // Step 1: Boss Orchestrator
             statusBoss.innerText = "Working";
-            statusBoss.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/40 animate-pulse";
-            logOutput.innerHTML += `<br>[00:00:02] 👑 Orchestrator Boss menganalisis tugas: "${task}"`;
+            statusBoss.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/40 animate-pulse";
+            logOutput.innerHTML += `<br>[00:03] [BOSS]: Menganalisis master prompt: "${task}"`;
             logOutput.scrollTop = logOutput.scrollHeight;
             await sleep(2000);
 
-            // Step 2: Analyst & Writer
-            statusBoss.innerText = "Delegating";
             statusAnalyst.innerText = "Working";
-            statusAnalyst.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/40 animate-pulse";
-            logOutput.innerHTML += `<br>[00:00:04] 📊 AI Data Analyst melakukan riset data & metrik...`;
+            statusAnalyst.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/40 animate-pulse";
+            logOutput.innerHTML += `<br>[00:05] [ANALYST]: Melakukan riset data & market intelligence...`;
             logOutput.scrollTop = logOutput.scrollHeight;
             await sleep(2500);
 
             statusWriter.innerText = "Working";
-            statusWriter.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/40 animate-pulse";
-            logOutput.innerHTML += `<br>[00:00:06] ✍️ AI Copywriter menyusun draf konten & copywriting...`;
+            statusWriter.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/40 animate-pulse";
+            logOutput.innerHTML += `<br>[00:07] [WRITER]: Menyusun draf konten pemasaran otomatis...`;
             logOutput.scrollTop = logOutput.scrollHeight;
             await sleep(2500);
 
-            // Step 3: Coder
             statusCoder.innerText = "Working";
-            statusCoder.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse";
-            logOutput.innerHTML += `<br>[00:00:09] 💻 AI Coder merakit automation script & endpoint...`;
+            statusCoder.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse";
+            logOutput.innerHTML += `<br>[00:10] [CODER]: Mendeploy automation script & endpoint...`;
             logOutput.scrollTop = logOutput.scrollHeight;
             await sleep(3000);
 
-            // Completion
             statusBoss.innerText = "Done";
-            statusBoss.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+            statusBoss.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
             statusAnalyst.innerText = "Idle";
-            statusAnalyst.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
+            statusAnalyst.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
             statusWriter.innerText = "Idle";
-            statusWriter.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
+            statusWriter.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
             statusCoder.innerText = "Idle";
-            statusCoder.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
+            statusCoder.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
 
-            statusText.innerText = "Completed";
-            statusText.className = "text-emerald-400";
-            logOutput.innerHTML += `<br>[00:00:12] ✅ Semua Tim AI selesai mengeksekusi tugas dengan sukses! Sistem siaga 24/7.`;
+            commandBadge.innerText = "COMPLETED";
+            commandBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono";
+            logOutput.innerHTML += `<br>[00:13] [SUCCESS]: Seluruh tim AI selesai mengeksekusi workflow 24/7.`;
             logOutput.scrollTop = logOutput.scrollHeight;
 
             document.getElementById('runBtn').disabled = false;
@@ -440,14 +419,14 @@ index.html
 
         function clearWorkflow() {
             document.getElementById('taskInput').value = "";
-            document.getElementById('logOutput').innerHTML = `[00:00:01] 🏢 Workspace reset. Ready for new command...`;
-            document.getElementById('workflowStatusText').innerText = "Standby";
-            document.getElementById('workflowStatusText').className = "text-amber-400";
+            document.getElementById('logOutput').innerHTML = `[00:01] [SYSTEM]: Workspace reset. Ready for new command...`;
+            document.getElementById('commandBadge').innerText = "READY";
+            document.getElementById('commandBadge').className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono";
             
             ['boss', 'writer', 'coder', 'analyst'].forEach(agent => {
                 const el = document.getElementById(`status-${agent}`);
-                el.innerText = "Idle";
-                el.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
+                el.innerText = agent === 'boss' ? 'Standby' : 'Idle';
+                el.className = "px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-gray-400 border border-slate-700";
             });
         }
 
