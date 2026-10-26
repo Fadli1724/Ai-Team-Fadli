@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fadli's AI Virtual Office 3D</title>
     <style>
-        * { box-sizing: border-box; }
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #060913;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #050811;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             user-select: none;
         }
         #ui-overlay {
@@ -22,13 +21,12 @@
             z-index: 10;
         }
         h1 {
-            font-size: 22px;
+            font-size: 20px;
             margin: 0 0 4px 0;
-            background: linear-gradient(90deg, #38bdf8, #818cf8, #f43f5e);
+            background: linear-gradient(90deg, #38bdf8, #f43f5e, #fb923c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
-            letter-spacing: -0.5px;
         }
         p {
             font-size: 12px;
@@ -37,54 +35,44 @@
         }
         #status-panel {
             position: absolute;
-            top: 85px;
+            top: 80px;
             left: 20px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 14px 18px;
-            border-radius: 14px;
-            width: 280px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            width: 260px;
             z-index: 10;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .status-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #38bdf8;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         .robot-status-item {
             font-size: 11px;
             color: #cbd5e1;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            padding-bottom: 4px;
         }
         .robot-status-item span {
             color: #38bdf8;
-            font-weight: 500;
+            font-weight: 600;
         }
         #control-panel {
             position: absolute;
             bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px);
-            padding: 16px 22px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 15px 20px;
             border-radius: 16px;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            border: 1px solid rgba(56, 189, 248, 0.4);
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            gap: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             z-index: 10;
-            width: 460px;
+            width: 420px;
         }
         .input-row {
             display: flex;
@@ -93,13 +81,12 @@
         input {
             background: #090d16;
             border: 1px solid #334155;
-            padding: 11px 16px;
+            padding: 10px 14px;
             color: white;
             border-radius: 10px;
             flex: 1;
             outline: none;
             font-size: 13px;
-            transition: border-color 0.2s;
         }
         input:focus {
             border-color: #38bdf8;
@@ -108,11 +95,11 @@
             background: linear-gradient(135deg, #0284c7, #2563eb);
             border: none;
             color: white;
-            padding: 11px 20px;
+            padding: 10px 18px;
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
         }
         button:hover {
             opacity: 0.9;
@@ -121,11 +108,10 @@
         #log-box {
             font-size: 11px;
             color: #38bdf8;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 9px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
             border-radius: 8px;
             border-left: 3px solid #38bdf8;
-            line-height: 1.4;
         }
     </style>
     <!-- Three.js CDN -->
@@ -135,176 +121,187 @@
 
     <div id="ui-overlay">
         <h1>Fadli's AI Virtual Office 3D</h1>
-        <p>Orchestrator: Boss Fadli | Autonomous AI Workforce</p>
+        <p>Orchestrator: Boss Fadli | Detailed Blocky Mecha Workforce</p>
     </div>
 
     <div id="status-panel">
-        <div class="status-title">LIVE WORKFORCE STATUS</div>
+        <p style="font-weight: bold; color: #fff; margin-bottom: 8px;">LIVE ROBOT STATUS</p>
         <div id="status-list"></div>
     </div>
 
     <div id="control-panel">
         <div class="input-row">
             <input type="text" id="promptInput" placeholder="Cth: @Delta buat kopi / @Alpha matikan lampu">
-            <button onclick="sendCommand()">Eksekusi</button>
+            <button onclick="sendCommand()">Kirim</button>
         </div>
         <div id="log-box">Sistem siap. Ketik perintah berformat @namarobot [perintah]...</div>
     </div>
 
     <script>
-        // --- 1. SETUP SCENE, CAMERA, & RENDERER ---
+        // --- SETUP SCENE, CAMERA, & RENDERER ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x060913);
-        scene.fog = new THREE.FogExp2(0x060913, 0.007);
+        scene.background = new THREE.Color(0x050811);
+        scene.fog = new THREE.FogExp2(0x050811, 0.007);
 
-        const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 34);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 16, 35);
         camera.lookAt(0, 4, 0);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
 
-        // --- 2. LIGHTING (PENCAHAYAAN MODERN) ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        // --- PENCAHAYAAN RUANGAN ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         scene.add(ambientLight);
 
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1.3);
-        mainLight.position.set(12, 28, 15);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(10, 25, 15);
         mainLight.castShadow = true;
         scene.add(mainLight);
 
-        // Lampu Neon Ambient Lantai 1 & 2
-        const neonLight1 = new THREE.PointLight(0x38bdf8, 1.2, 25);
-        neonLight1.position.set(0, 4, 0);
-        scene.add(neonLight1);
-
-        const neonLight2 = new THREE.PointLight(0xf43f5e, 1.0, 25);
-        neonLight2.position.set(0, 11, 0);
-        scene.add(neonLight2);
-
-        // --- 3. ARSITEKTUR GEDUNG 2 LANTAI ---
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.2 });
-        const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.12, roughness: 0.1 });
-
+        // --- STRUKTUR GEDUNG 2 LANTAI (DENGAN PILAR & DINDING DETAIL) ---
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.4 });
+        
         // Lantai 1
-        const floor1 = new THREE.Mesh(new THREE.BoxGeometry(32, 0.4, 18), floorMat);
+        const floor1 = new THREE.Mesh(new THREE.BoxGeometry(30, 0.4, 18), floorMat);
         floor1.position.set(0, -0.2, 0);
-        floor1.receiveShadow = true;
         scene.add(floor1);
 
         // Lantai 2
-        const floor2 = new THREE.Mesh(new THREE.BoxGeometry(32, 0.4, 18), floorMat);
+        const floor2 = new THREE.Mesh(new THREE.BoxGeometry(30, 0.4, 18), floorMat);
         floor2.position.set(0, 8, 0);
-        floor2.receiveShadow = true;
         scene.add(floor2);
 
-        // Dinding Belakang Modern
-        const backWall = new THREE.Mesh(new THREE.BoxGeometry(32, 8.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.9 }));
-        backWall.position.set(0, 4, -9);
-        scene.add(backWall);
+        // Dinding Belakang & Sekat
+        const backWall1 = new THREE.Mesh(new THREE.BoxGeometry(30, 8, 0.4), new THREE.MeshStandardMaterial({ color: 0x1f2937 }));
+        backWall1.position.set(0, 3.8, -9);
+        scene.add(backWall1);
 
-        // --- 4. RUANGAN & FURNITUR ---
+        const backWall2 = new THREE.Mesh(new THREE.BoxGeometry(30, 8, 0.4), new THREE.MeshStandardMaterial({ color: 0x1f2937 }));
+        backWall2.position.set(0, 12, -9);
+        scene.add(backWall2);
 
-        // A. Ruang Kerja Boss Fadli (Lantai 2)
-        const bossDesk = new THREE.Mesh(new THREE.BoxGeometry(4, 0.25, 2), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.5 }));
-        bossDesk.position.set(0, 8.25, -5);
+        // Pilar-pilar Penyangga Modern
+        [-14, 0, 14].forEach(x => {
+            let pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 16, 0.8), new THREE.MeshStandardMaterial({ color: 0x374151 }));
+            pillar.position.set(x, 4, -8.6);
+            scene.add(pillar);
+        });
+
+        // --- RUANG KERJA BOS (FADLI) DI LANTAI 2 ---
+        const bossDesk = new THREE.Mesh(new THREE.BoxGeometry(4, 0.3, 2), new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 }));
+        bossDesk.position.set(0, 8.35, -5);
         scene.add(bossDesk);
 
-        const fadliAvatar = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.9, 0.6), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.3 }));
-        fadliAvatar.position.set(0, 8.85, -5);
+        const fadliAvatar = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1, 0.7), new THREE.MeshStandardMaterial({ color: 0x38bdf8 }));
+        fadliAvatar.position.set(0, 9, -5);
         scene.add(fadliAvatar);
 
-        // B. Gaming PC Setup (Alpha & Beta - Lantai 2)
-        [-8, 8].forEach(x => {
-            let desk = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.2, 1.8), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
-            desk.position.set(x, 8.25, 4);
-            scene.add(desk);
+        // --- COFFEE BAR (LANTAI 1) ---
+        const coffeeCounter = new THREE.Mesh(new THREE.BoxGeometry(4.5, 1, 1.8), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+        coffeeCounter.position.set(9, 0.5, 4);
+        scene.add(coffeeCounter);
 
-            let monitor = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.3, 0.1), new THREE.MeshStandardMaterial({ color: 0x00f2fe, emissive: 0x00f2fe, emissiveIntensity: 0.6 }));
-            monitor.position.set(x, 9.1, 3.9);
+        const coffeeMachine = new THREE.Mesh(new THREE.BoxGeometry(1, 0.9, 0.8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0x331100 }));
+        coffeeMachine.position.set(9, 1.45, 4);
+        scene.add(coffeeMachine);
+
+        const coffeeCup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.22, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 }));
+        coffeeCup.position.set(8.2, 1.15, 4);
+        scene.add(coffeeCup);
+
+        // --- SOFA SANTAI (LANTAI 1) ---
+        const sofa = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.7, 1.8), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+        sofa.position.set(-9, 0.35, -4);
+        scene.add(sofa);
+
+        // --- RUANG SHOLAT (LANTAI 1) ---
+        const prayerMat = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.04, 3.6), new THREE.MeshStandardMaterial({ color: 0x065f46 }));
+        prayerMat.position.set(-9, 0.02, 5);
+        scene.add(prayerMat);
+
+        // --- GAMING PC (LANTAI 2) ---
+        [-7, 7].forEach(x => {
+            let pcDesk = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.25, 1.8), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+            pcDesk.position.set(x, 8.35, 3);
+            scene.add(pcDesk);
+            let monitor = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 0.1), new THREE.MeshStandardMaterial({ color: 0x00f2fe, emissive: 0x00f2fe, emissiveIntensity: 0.6 }));
+            monitor.position.set(x, 9.1, 2.9);
             scene.add(monitor);
         });
 
-        // C. Sofa Santai Robot (Gamma - Lantai 1)
-        const sofa = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.7, 1.8), new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 }));
-        sofa.position.set(-10, 0.35, -5);
-        scene.add(sofa);
-
-        // D. Coffee Bar Lengkap (Delta - Lantai 1)
-        const coffeeCounter = new THREE.Mesh(new THREE.BoxGeometry(5, 1, 2), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 }));
-        coffeeCounter.position.set(10, 0.5, 5);
-        scene.add(coffeeCounter);
-
-        const coffeeMachine = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1, 1), new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0x3d1c00 }));
-        coffeeMachine.position.set(10, 1.5, 5);
-        scene.add(coffeeMachine);
-
-        const coffeeCup = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.1, 0.25, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.2 }));
-        coffeeCup.position.set(9.2, 1.15, 5);
-        scene.add(coffeeCup);
-
-        // E. Ruang Sholat (Epsilon - Lantai 1)
-        const prayerMat = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.04, 3.8), new THREE.MeshStandardMaterial({ color: 0x065f46, roughness: 0.9 }));
-        prayerMat.position.set(-10, 0.02, 5);
-        scene.add(prayerMat);
-
-        // F. Tangga & Lift Modern (Zeta & Akses Lantai)
+        // --- TANGGA & LIFT ---
         for(let i=0; i<8; i++) {
-            let step = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 0.8), new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.5 }));
-            step.position.set(13.5, i * 1.0 + 0.5, -3 + (i * 0.6));
+            let step = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 0.8), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+            step.position.set(13, i * 1.0 + 0.5, -3 + (i * 0.6));
             scene.add(step);
         }
-        const liftShaft = new THREE.Mesh(new THREE.BoxGeometry(2.6, 8.4, 2.6), glassMat);
-        liftShaft.position.set(-13.5, 4, -3);
+        const liftShaft = new THREE.Mesh(new THREE.BoxGeometry(2.5, 8, 2.5), new THREE.MeshStandardMaterial({ color: 0x1e293b, transparent: true, opacity: 0.3 }));
+        liftShaft.position.set(-13, 4, -3);
         scene.add(liftShaft);
 
-        // G. Saklar Lampu Dinding Interaktif (Lantai 1)
+        // --- SAKLAR LAMPU DINDING ---
         const lightSwitch = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.35, 0.1), new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0x7f1d1d }));
-        lightSwitch.position.set(-15.2, 2, 0);
+        lightSwitch.position.set(-14.8, 2, 0);
         scene.add(lightSwitch);
 
-        // --- 5. MODEL 3D ROBOT FUTURISTIK (TIDAK KAKU) ---
-        function createFuturisticRobot(colorHex) {
+        // --- PEMBUATAN ROBOT KOTAK (BLOCKY MECHA ROBOT) ---
+        function createBlockyRobot(colorHex) {
             const group = new THREE.Group();
             
-            // Base Roda/Pijakan
-            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.2, 16), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 }));
-            base.position.y = 0.1;
-            group.add(base);
+            const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.3, metalness: 0.6 });
+            const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
 
-            // Bodi Kapsul Melengkung
-            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 0.8, 16), new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.3, metalness: 0.6 }));
-            body.position.y = 0.6;
-            group.add(body);
+            // Kaki Kiri & Kanan (Kotak)
+            const legLeft = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.4, 0.18), darkMat);
+            legLeft.position.set(-0.15, 0.2, 0);
+            group.add(legLeft);
 
-            // Kepala Robot
-            const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.5 }));
-            head.position.y = 1.15;
+            const legRight = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.4, 0.18), darkMat);
+            legRight.position.set(0.15, 0.2, 0);
+            group.add(legRight);
+
+            // Torso / Badan Utama (Kotak)
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.4), mat);
+            torso.position.y = 0.75;
+            group.add(torso);
+
+            // Lengan Kiri & Kanan (Kotak)
+            const armLeft = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), darkMat);
+            armLeft.position.set(-0.4, 0.75, 0);
+            group.add(armLeft);
+
+            const armRight = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), darkMat);
+            armRight.position.set(0.4, 0.75, 0);
+            group.add(armRight);
+
+            // Kepala Kotak (Blocky Head)
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.35, 0.4), mat);
+            head.position.y = 1.3;
             group.add(head);
 
-            // Visor LED Neon
-            const visor = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.16), new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.9 }));
-            visor.position.set(0, 1.15, 0.11);
+            // Visor LED Neon di Muka Robot
+            const visor = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.1, 0.05), new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.9 }));
+            visor.position.set(0, 1.3, 0.21);
             group.add(visor);
 
             return group;
         }
 
-        // --- 6. 6 ROBOT DATA & INISIALISASI ---
+        // --- 6 ROBOT DATA & INISIALISASI ---
         const robots = [
-            { name: "alpha", color: 0x38bdf8, pos: new THREE.Vector3(-8, 8.2, 4), target: new THREE.Vector3(-8, 8.2, 4), status: "Bekerja di PC Gaming (L2)" },
-            { name: "beta", color: 0xa855f7, pos: new THREE.Vector3(8, 8.2, 4), target: new THREE.Vector3(8, 8.2, 4), status: "Analisis Algoritma (L2)" },
-            { name: "gamma", color: 0xf97316, pos: new THREE.Vector3(-10, 0.2, -5), target: new THREE.Vector3(-10, 0.2, -5), status: "Bersantai di Sofa (L1)" },
-            { name: "delta", color: 0x10b981, pos: new THREE.Vector3(10, 0.2, 5), target: new THREE.Vector3(10, 0.2, 5), status: "Standby di Coffee Bar (L1)" },
-            { name: "epsilon", color: 0x3b82f6, pos: new THREE.Vector3(-10, 0.2, 5), target: new THREE.Vector3(-10, 0.2, 5), status: "Menjaga Ruang Sholat (L1)" },
-            { name: "zeta", color: 0xec4899, pos: new THREE.Vector3(13.5, 0.2, -3), target: new THREE.Vector3(13.5, 0.2, -3), status: "Operator Lift & Tangga" }
+            { name: "alpha", color: 0x38bdf8, pos: new THREE.Vector3(-7, 8.4, 3), target: new THREE.Vector3(-7, 8.4, 3), status: "Bekerja di PC Gaming (L2)" },
+            { name: "beta", color: 0xa855f7, pos: new THREE.Vector3(7, 8.4, 3), target: new THREE.Vector3(7, 8.4, 3), status: "Analisis Data Sistem (L2)" },
+            { name: "gamma", color: 0xf97316, pos: new THREE.Vector3(-9, 0.2, -4), target: new THREE.Vector3(-9, 0.2, -4), status: "Bersantai di Sofa (L1)" },
+            { name: "delta", color: 0x10b981, pos: new THREE.Vector3(9, 0.2, 4), target: new THREE.Vector3(9, 0.2, 4), status: "Standby di Coffee Bar (L1)" },
+            { name: "epsilon", color: 0x3b82f6, pos: new THREE.Vector3(-9, 0.2, 5), target: new THREE.Vector3(-9, 0.2, 5), status: "Menjaga Ruang Sholat (L1)" },
+            { name: "zeta", color: 0xec4899, pos: new THREE.Vector3(0, 0.2, 5), target: new THREE.Vector3(0, 0.2, 5), status: "Operator Lift & Tangga (L1)" }
         ];
 
         const robotMeshes = robots.map(r => {
-            const mesh = createFuturisticRobot(r.color);
+            const mesh = createBlockyRobot(r.color);
             mesh.position.copy(r.pos);
             scene.add(mesh);
             return { data: r, mesh: mesh };
@@ -321,25 +318,23 @@
         }
         updateStatusUI();
 
-        // --- 7. KONTROL LAMPU & SAKLAR ---
+        // --- KONTROL LAMPU ---
         let isLightOn = true;
         function toggleLights(status, robotName) {
             isLightOn = status;
-            mainLight.intensity = isLightOn ? 1.3 : 0.15;
-            neonLight1.intensity = isLightOn ? 1.2 : 0.1;
-            neonLight2.intensity = isLightOn ? 1.0 : 0.1;
-            scene.background.setHex(isLightOn ? 0x060913 : 0x020307);
+            mainLight.intensity = isLightOn ? 1.2 : 0.2;
+            scene.background.setHex(isLightOn ? 0x050811 : 0x020306);
             lightSwitch.material.emissive.setHex(isLightOn ? 0x7f1d1d : 0x047857);
             
-            let msg = isLightOn ? "Lampu ruangan dihidupkan." : "Lampu ruangan dimatikan (Mode Gelap).";
+            let msg = isLightOn ? "Lampu ruangan dihidupkan." : "Lampu ruangan dimatikan.";
             if(robotName) {
-                msg = `Robot @${robotName} berjalan ke saklar dinding dan ${isLightOn ? 'menyalakan' : 'mematikan'} lampu!`;
+                msg = `Robot @${robotName} menekan saklar dinding dan ${isLightOn ? 'menyalakan' : 'mematikan'} lampu!`;
             }
             document.getElementById('log-box').innerText = msg;
             updateStatusUI();
         }
 
-        // --- 8. SISTEM PERINTAH & ANIMASI JALAN ---
+        // --- SISTEM PERINTAH & ANIMASI JALAN ---
         function sendCommand() {
             const raw = document.getElementById('promptInput').value.trim();
             if(!raw) return;
@@ -352,57 +347,55 @@
 
             if(targetRobot) {
                 if(lower.includes('matikan lampu') || lower.includes('matiin lampu')) {
-                    targetRobot.data.target.set(-14.2, 0.2, 0);
+                    targetRobot.data.target.set(-14, 0.2, 0);
                     targetRobot.data.status = "Berjalan ke Saklar";
                     setTimeout(() => {
                         toggleLights(false, targetRobot.data.name);
                         targetRobot.data.status = "Standby (Lampu Mati)";
                         updateStatusUI();
-                    }, 1800);
+                    }, 1600);
                 } else if(lower.includes('hidupkan lampu') || lower.includes('nyalakan lampu')) {
-                    targetRobot.data.target.set(-14.2, 0.2, 0);
+                    targetRobot.data.target.set(-14, 0.2, 0);
                     targetRobot.data.status = "Berjalan ke Saklar";
                     setTimeout(() => {
                         toggleLights(true, targetRobot.data.name);
                         targetRobot.data.status = "Standby (Lampu Hidup)";
                         updateStatusUI();
-                    }, 1800);
+                    }, 1600);
                 } else if(lower.includes('kopi') || lower.includes('buatkan kopi')) {
-                    targetRobot.data.target.set(9.2, 0.2, 5);
-                    targetRobot.data.status = "Meracik Kopi di Bar";
+                    targetRobot.data.target.set(8.2, 0.2, 4);
+                    targetRobot.data.status = "Meracik Kopi";
                     setTimeout(() => {
-                        document.getElementById('log-box').innerText = `Robot @${targetRobot.data.name}: "Secangkir kopi hangat siap disajikan untuk Boss Fadli!"`;
+                        document.getElementById('log-box').innerText = `Robot @${targetRobot.data.name}: "Kopi hangat siap disajikan untuk Boss Fadli!"`;
                         coffeeCup.material.emissiveIntensity = 0.9;
                         updateStatusUI();
-                    }, 1800);
+                    }, 1600);
                 } else {
-                    targetRobot.data.status = "Mengeksekusi Tugas";
-                    document.getElementById('log-box').innerText = `Robot @${targetRobot.data.name} merespons perintah: "${raw}"`;
+                    targetRobot.data.status = "Menjalankan Tugas";
+                    document.getElementById('log-box').innerText = `Robot @${targetRobot.data.name} merespons: "${raw}"`;
                     updateStatusUI();
                 }
             } else {
                 if(lower.includes('matikan lampu')) toggleLights(false);
                 else if(lower.includes('hidupkan lampu')) toggleLights(true);
-                else document.getElementById('log-box').innerText = `Perintah umum dikirim ke workforce: "${raw}"`;
+                else document.getElementById('log-box').innerText = `Perintah umum: "${raw}"`;
             }
 
             document.getElementById('promptInput').value = '';
             updateStatusUI();
         }
 
-        // --- 9. ANIMASI LOOP (RENDERING & SMOOTH MOVEMENT) ---
+        // --- ANIMASI LOOP ---
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
             robotMeshes.forEach(rm => {
-                // Pergerakan halus menuju target koordinat (animasi jalan)
                 rm.mesh.position.lerp(rm.data.target, 0.05);
-                
-                // Efek mengambang/napas natural saat robot diam di tempat
+                // Efek melayang/mengapung halus saat robot diam
                 if(rm.mesh.position.distanceTo(rm.data.target) < 0.1) {
-                    rm.mesh.position.y = rm.data.target.y + Math.sin(time * 4 + rm.mesh.id) * 0.03;
+                    rm.mesh.position.y = rm.data.target.y + Math.sin(time * 5 + rm.mesh.id) * 0.03;
                 }
             });
 
@@ -410,7 +403,7 @@
         }
         animate();
 
-        // Responsive Window Resize
+        // Responsive
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
